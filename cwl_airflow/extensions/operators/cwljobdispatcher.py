@@ -40,13 +40,16 @@ class CWLJobDispatcher(BaseOperator):
         file location.
         """
 
+
+        dump_json(context["dag_run"].conf["job"], "/Users/kot4or/temp/del/cwltool/job.json")
+        dump_json(context["dag"].workflow, "/Users/kot4or/temp/del/cwltool/workflow.cwl")
         setup_cwl_logger(context["ti"])
         post_status(context)
 
         # for easy access
         dag_id = context["dag"].dag_id
         workflow = context["dag"].workflow
-        run_id = context["run_id"].replace(":", "_").replace("+", "_")  # to make it dumpable by json
+        run_id = context["run_id"].replace(":", "_").replace("+", "_") if context["run_id"] is not None else ""  # to make it dumpable by json
         cwl_args = context["dag"].default_args["cwl"]
 
         # Loads job from dag_run configuration. Sets defaults from "workflow". Fails on missing input files

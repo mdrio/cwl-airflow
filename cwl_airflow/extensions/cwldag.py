@@ -1,6 +1,4 @@
 #! /usr/bin/env python3
-import os
-
 from copy import deepcopy
 from airflow.models import DAG
 from airflow.utils.dates import days_ago
@@ -11,6 +9,7 @@ from cwl_airflow.utilities.cwl import (
     get_default_cwl_args
 )
 from cwl_airflow.extensions.operators.cwlstepoperator import CWLStepOperator
+from cwl_airflow.extensions.operators.cwlsuboperator import CWLSubOperator
 from cwl_airflow.extensions.operators.cwljobdispatcher import CWLJobDispatcher
 from cwl_airflow.extensions.operators.cwljobgatherer import CWLJobGatherer
 from cwl_airflow.utilities.report import (
@@ -42,12 +41,13 @@ class CWLDAG(DAG):
 
         self.workflow = workflow
         self.__setup_params(kwargs)
+        self.kwargs = kwargs                             # for easy access from the other functions
 
         super().__init__(dag_id=dag_id, *args, **kwargs)
 
-        self.workflow_tool = fast_cwl_load(         # keeps only the tool (CommentedMap object)
+        self.workflow_tool = fast_cwl_load(              # keeps only the tool (CommentedMap object)
             workflow=self.workflow,
-            cwl_args=kwargs["default_args"]["cwl"]  # in case user has overwritten some of the default parameters
+            cwl_args=self.kwargs["default_args"]["cwl"]  # in case user has overwritten some of the default parameters
         )
 
         self.dispatcher = CWLJobDispatcher(
@@ -121,7 +121,22 @@ class CWLDAG(DAG):
         task_by_out_id = {}     # to get airflow task assosiated with workflow step by its out id
         
         for step_id, step_data in get_items(self.workflow_tool["steps"]):
-            task_by_id[step_id] = CWLStepOperator(dag=self, task_id=step_id)
+            
+            # load tool from the "run" field to check if it's a Workflow
+            step_tool = fast_cwl_load(
+                workflow=step_data["run"],
+                cwl_args=self.kwargs["default_args"]["cwl"]
+            )
+            if step_tool["class"] == "Workflow":        # found sub-workflow, use CWLSubOperator
+                subdag = CWLDAG(
+                    dag_id=self.dag_id + "." + step_id,
+                    workflow=step_data["run"]
+                    **self.kwargs
+                )
+                task_by_id[step_id] = CWLSubOperator(dag=self, task_id=step_id, subdag=subdag)
+            else:
+                task_by_id[step_id] = CWLStepOperator(dag=self, task_id=step_id)
+
             for step_out_id, _ in get_items(step_data["out"]):
                 task_by_out_id[step_out_id] = task_by_id[step_id]
 
