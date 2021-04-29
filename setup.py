@@ -103,6 +103,7 @@ setup(
         "docker",
         "swagger-ui-bundle",
     ],
+    dependency_links=["git+https://github.com/mdrio/cwltool.git@gpu"],
     zip_safe=False,
     scripts=["cwl_airflow/bin/cwl-airflow"],
     classifiers=[
