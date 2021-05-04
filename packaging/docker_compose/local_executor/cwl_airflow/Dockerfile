@@ -28,11 +28,11 @@ WORKDIR /tmp
 # ARG need to be declared after FROM statement again. See details below
 # https://docs.docker.com/engine/reference/builder/#understand-how-arg-and-from-interact
 ARG PYTHON_VERSION
-ARG CWL_AIRFLOW_VERSION
 
-ENV CWL_AIRFLOW_URL "https://github.com/Barski-lab/cwl-airflow"
 ENV PYTHON_URL "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz"
 
+ENV CWL_AIRFLOW_VERSION "master"
+ENV CWL_AIRFLOW_URL "https://github.com/mdrio/cwl-airflow.git"
 COPY ./scripts/start_webserver.sh /usr/local/bin/start_webserver.sh
 COPY ./scripts/start_scheduler.sh /usr/local/bin/start_scheduler.sh
 COPY ./scripts/start_apiserver.sh /usr/local/bin/start_apiserver.sh
@@ -70,3 +70,4 @@ RUN echo "Installing dependencies" && \
     apt-get purge && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* && \
     strip /usr/local/bin/*; true
+
