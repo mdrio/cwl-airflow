@@ -4,7 +4,7 @@ git_branch=$(git rev-parse --abbrev-ref HEAD | tr /: _)
 git_commit=$(git rev-parse HEAD)
 git diff-index --quiet HEAD
 
-if [[ $?  == 0 ]]; then
+if [[ $?  > 0 ]]; then
   suffix='-dev'
 else
   suffix=''
