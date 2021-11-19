@@ -18,7 +18,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 WORKDIR /tmp
 
-ENV CWL_AIRFLOW_VERSION "master"
+ENV CWL_AIRFLOW_VERSION "feature/improve-report"
 ENV CWL_AIRFLOW_URL "https://github.com/mdrio/cwl-airflow.git"
 COPY ./scripts/start_webserver.sh /usr/local/bin/start_webserver.sh
 COPY ./scripts/start_scheduler.sh /usr/local/bin/start_scheduler.sh
@@ -28,7 +28,7 @@ RUN apt-get update && \
     # installing dependencies (including docker dependencies)
     apt-get install -y python3-dev python3-pip nodejs gcc git wget curl \
                        libmysqlclient-dev mysql-client apt-transport-https \
-                       ca-certificates gnupg-agent software-properties-common && \
+                       ca-certificates gnupg-agent software-properties-common unzip && \
     # installing docker-ce-cli
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
     add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" && \
@@ -48,3 +48,11 @@ RUN pip3 install -U pip                                                         
     apt-get purge                                                                           && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*                          && \
     strip /usr/local/bin/*; true
+# ARG AIRFLOW_UID="50000"
+# ARG AIRFLOW_GID="50000"
+# RUN addgroup --gid "${AIRFLOW_GID}" "airflow" && \
+#     adduser --quiet "airflow" --uid "${AIRFLOW_UID}" \
+#         --gid "${AIRFLOW_GID}"
+#
+# USER ${AIRFLOW_UID}
+#
