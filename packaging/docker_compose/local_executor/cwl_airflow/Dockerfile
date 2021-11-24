@@ -18,8 +18,9 @@ ENV DEBIAN_FRONTEND noninteractive
 
 WORKDIR /tmp
 
-ENV CWL_AIRFLOW_VERSION "master"
-ENV CWL_AIRFLOW_URL "https://github.com/mdrio/cwl-airflow.git"
+ARG CWL_AIRFLOW_VERSION "master"
+ARG CWL_AIRFLOW_URL "https://github.com/mdrio/cwl-airflow.git"
+ARG EXTRA_PIP_DEPS
 COPY ./scripts/start_webserver.sh /usr/local/bin/start_webserver.sh
 COPY ./scripts/start_scheduler.sh /usr/local/bin/start_scheduler.sh
 COPY ./scripts/start_apiserver.sh /usr/local/bin/start_apiserver.sh
@@ -40,7 +41,7 @@ RUN pip3 install -U pip                                                         
     git clone ${CWL_AIRFLOW_URL}                                                            && \
     cd cwl-airflow                                                                          && \
     git checkout ${CWL_AIRFLOW_VERSION}                                                     && \
-    pip3 install ".[mysql]" --constraint ./packaging/constraints/constraints-3.8.txt && \
+    pip3 install ".[mysql]" ${EXTRA_PIP_DEPS} --constraint ./packaging/constraints/constraints-3.8.txt && \
     cd ..                                                                                   && \
     rm -rf cwl-airflow                                                                      && \
     # cleaning up
