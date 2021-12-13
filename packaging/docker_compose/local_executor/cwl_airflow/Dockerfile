@@ -16,8 +16,6 @@
 
 # can be provided through --build-arg PARAM=value
 ARG UBUNTU_VERSION="20.04"
-ARG PYTHON_VERSION="3.8.10"
-ARG CWL_AIRFLOW_VERSION="master"
 
 FROM ubuntu:${UBUNTU_VERSION}
 LABEL maintainer="misha.kotliar@gmail.com"
@@ -27,11 +25,11 @@ WORKDIR /tmp
 
 # ARG need to be declared after FROM statement again. See details below
 # https://docs.docker.com/engine/reference/builder/#understand-how-arg-and-from-interact
-ARG PYTHON_VERSION
+ARG PYTHON_VERSION="3.8.10"
+ARG CWL_AIRFLOW_VERSION="master"
 
 ENV PYTHON_URL "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz"
 
-ENV CWL_AIRFLOW_VERSION "master"
 ENV CWL_AIRFLOW_URL "https://github.com/mdrio/cwl-airflow.git"
 COPY ./scripts/start_webserver.sh /usr/local/bin/start_webserver.sh
 COPY ./scripts/start_scheduler.sh /usr/local/bin/start_scheduler.sh
