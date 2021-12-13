@@ -94,7 +94,7 @@ setup(
     extras_require=EXTRAS_REQUIRE,
     install_requires=[
         "apache-airflow==2.1.4",
-        "git+https://github.com/mdrio/cwltool.git@gpu",
+        "cwltool @ git+https://github.com/mdrio/cwltool.git@gpu",
         "cwltest==2.1.20210626101542",
         "jsonmerge",
         "connexion",
